@@ -27,8 +27,8 @@ jobs:
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         # Launch CloudFormation stack and get the output for the API endpoint
         run: |
-          npm install -g aws-cdk && npm install
-          cd sample && cdk synth --no-staging > cloudformation.yaml
+          npm install -g aws-cdk
+          cd sample && npm install && cdk synth --no-staging > cloudformation.yaml
           aws cloudformation deploy --template-file ./cloudformation.yaml --stack-name test-stack --capabilities CAPABILITY_IAM
           aws cloudformation wait stack-create-complete --stack-name test-stack
           API_ENDPOINT=$(aws cloudformation describe-stacks --stack-name test-stack --query 'Stacks[0].Outputs[?OutputKey==`APIEndpoint`].OutputValue' --output text)
