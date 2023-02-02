@@ -1,0 +1,42 @@
+name: RESTful API test workflow with Postman
+
+on: 
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Node 12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: Env Prepare
+        # Configure env with aws credentials
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        # Launch CloudFormation stack and get the output for the API endpoint
+        run: |
+          npm install -g aws-cdk
+          cd sample && cdk synth --no-staging > cloudformation.yaml
+          aws cloudformation deploy --template-file ./cloudformation.yaml --stack-name test-stack --capabilities CAPABILITY_IAM
+          aws cloudformation wait stack-create-complete --stack-name test-stack
+          API_ENDPOINT=$(aws cloudformation describe-stacks --stack-name test-stack --query 'Stacks[0].Outputs[?OutputKey==`APIEndpoint`].OutputValue' --output text)
+          echo "API_ENDPOINT=$API_ENDPOINT" >> $GITHUB_ENV
+      - name: Install newman
+        run: npm install -g newman
+      - name: Run UI test with Newman
+        env:
+          API_ENDPOINT: ${{ env.API_ENDPOINT }}
+        run: |
+          npx newman run ./postman_collection.json -r cli,html --reporter-html-export ./newman_report.html -e API_ENDPOINT
+      - name: Tear Down Env
+        run: aws cloudformation delete-stack --stack-name test-stack 
