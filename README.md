@@ -7,11 +7,11 @@ This is a template for a workflow. It is meant to be used as a starting point fo
 3. Execute the `workflow` script to start the workflow
 
 ## Build Stage
-The build stage is used to build the project. It is executed by the `Build` script.
+The build stage is used to build the project. It is executed by the `build` script.
 
 ## Test Stage
-The test stage is used to test the project by usage of UT/ST/Acceptance tests. It is executed by the `Test` script.
+The test stage is used to test the project by usage of UT/ST/Acceptance tests. It is executed by the `test*` script.
 
 ## Maintainance Stage
-The maintainance stage is used for maintainance tasks, including routine dependency update, PR lint. It is executed by the `Dep_upgrade`, `PR_lint` script.
+The maintainance stage is used for maintainance tasks, including routine dependency update, PR lint. It is executed by the `depUpgrade`, `prLint` script.
 
