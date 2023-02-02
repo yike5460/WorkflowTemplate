@@ -1,0 +1,59 @@
+name: Pull Request Check Workflow
+
+on: 
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+jobs:
+  cfn_nag:
+    name: cfn_nag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: cfn_nag
+        run: |
+          wget -q
+          unzip -q cfn_nag.zip -d ../cfn_nag
+          rm -r ./cfn_nag.zip
+          echo "CloudFormation template scanning utility installation complete `date`"
+          echo "Starting CloudFormation template scanning `date` in `pwd`"
+          ../cfn_nag/bin/cfn_nag_scan --input-path .
+          echo "Completed CloudFormation template scanning `date`"
+
+  viperlight:
+    name: viperlight
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Viperlight
+        run: |
+          wget -q https://viperlight-scanner.s3.amazonaws.com/latest/.viperlightrc
+          wget -q https://viperlight-scanner.s3.amazonaws.com/latest/viperlight.zip
+          unzip -q viperlight.zip -d ../viperlight
+          rm -r ./viperlight.zip
+          echo "Content scanning utility installation complete `date`"
+          echo "Starting content scanning `date` in `pwd`"
+          ../viperlight/bin/viperlight scan -m files-contents -m files-aws -m files-binary -m files-entropy -m files-secrets
+          echo "Completed content scanning `date`"
+
+  git-secrets:
+    name: git-secrets
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Checkout awslabs/git-secrets
+        uses: actions/checkout@v2
+        with:
+          repository: awslabs/git-secrets
+          ref: master
+          path: git-secrets
+      - name: Install git-secrets
+        run: cd git-secrets && sudo make install && cd ..
+      - name: Run git-secrets
+        run: |
+          git-secrets --register-aws
+          git-secrets --scan
