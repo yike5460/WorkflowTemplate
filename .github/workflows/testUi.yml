@@ -8,6 +8,18 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+  # workflow_dispatch:
+  #     inputs:
+  #       AWS_ACCESS_KEY_ID:
+  #         description: "Access Key ID with Permissions to deploy IAM, and OIDC"
+  #         required: true
+  #       AWS_SECRET_ACCESS_KEY:
+  #         description: "Secret Access Key with Permissions to deploy IAM, and OIDC"
+  #         required: true
+  #       AWS_REGION:
+  #         description: "Region to deploy to."
+  #         required: true
+
 jobs:
   build:
     name: Build and Test
@@ -16,23 +28,43 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set up Node 16
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: 16.x
-      - name: Env Prepare
-        # Configure env with aws credentials
+          node-version: "16"
+      # - name: Env Prepare
+      #   # Configure env with aws credentials
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+
+      - name: cdk deploy
+        uses: youyo/aws-cdk-github-actions@v2
+        with:
+          cdk_subcommand: 'deploy'
+          cdk_stack: 'test-stack'
+          cdk_args: '--require-approval never'
+          actions_comment: false
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        # Launch CloudFormation stack and get the output for the API endpoint
+          AWS_DEFAULT_REGION: 'us-west-2'
+
+      - name: Get API Endpoint
         run: |
-          npm install -g aws-cdk
-          cd sample && npm install && cdk synth --no-staging > cloudformation.yaml
-          aws cloudformation deploy --template-file ./cloudformation.yaml --stack-name test-stack --capabilities CAPABILITY_IAM
           aws cloudformation wait stack-create-complete --stack-name test-stack
           API_ENDPOINT=$(aws cloudformation describe-stacks --stack-name test-stack --query 'Stacks[0].Outputs[?OutputKey==`APIEndpoint`].OutputValue' --output text)
           echo "API_ENDPOINT=$API_ENDPOINT" >> $GITHUB_ENV
+
+        # Launch CloudFormation stack and get the output for the API endpoint
+        # run: |
+        #   npm install -g aws-cdk
+        #   cd sample && cdk synth --no-staging > cloudformation.yaml
+        #   aws cloudformation deploy --template-file ./cloudformation.yaml --stack-name test-stack --capabilities CAPABILITY_IAM
+        #   aws cloudformation wait stack-create-complete --stack-name test-stack
+        #   API_ENDPOINT=$(aws cloudformation describe-stacks --stack-name test-stack --query 'Stacks[0].Outputs[?OutputKey==`APIEndpoint`].OutputValue' --output text)
+        #   echo "API_ENDPOINT=$API_ENDPOINT" >> $GITHUB_ENV
+
       - name: Install newman
         run: npm install -g newman
       - name: Run UI test with Newman
