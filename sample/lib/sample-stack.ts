@@ -32,6 +32,6 @@ export class SampleStack extends Stack {
     // export API endpoint with cfnoutput
     new CfnOutput(this, 'APIEndpoint', {
       value: api.url,
-    }).overrideLogicalId('url');
+    }).overrideLogicalId('APIEndpoint');
   }
 }

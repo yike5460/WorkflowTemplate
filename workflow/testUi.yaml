@@ -31,30 +31,28 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: "16"
-      - name: Get Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: 'us-west-2'
+      # - name: Get Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: 'us-west-2'
       - name: Deploy Test Stack
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'deploy'
           cdk_stack: 'SampleStack'
-          cdk_args: '--require-approval never'
+          cdk_args: '--require-approval never --outputs-file cdk-output.json'
           working_dir: 'sample'
           actions_comment: false
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+          AWS_DEFAULT_REGION: 'us-west-2'
       - name: Get API Endpoint
         run: |
-          aws cloudformation wait stack-create-complete --stack-name SampleStack
-          API_ENDPOINT=$(aws cloudformation describe-stacks --stack-name test-stack --query 'Stacks[0].Outputs[?OutputKey==`APIEndpoint`].OutputValue' --output text)
+          API_ENDPOINT=$(cat cdk-output.json | jq -r '.SampleStack.APIEndpoint')
           echo "API_ENDPOINT=$API_ENDPOINT" >> $GITHUB_ENV
-
         # Launch CloudFormation stack and get the output for the API endpoint
         # run: |
         #   npm install -g aws-cdk
@@ -63,13 +61,13 @@ jobs:
         #   aws cloudformation wait stack-create-complete --stack-name test-stack
         #   API_ENDPOINT=$(aws cloudformation describe-stacks --stack-name test-stack --query 'Stacks[0].Outputs[?OutputKey==`APIEndpoint`].OutputValue' --output text)
         #   echo "API_ENDPOINT=$API_ENDPOINT" >> $GITHUB_ENV
-
       - name: Install newman
         run: npm install -g newman
       - name: Run UI test with Newman
         env:
           API_ENDPOINT: ${{ env.API_ENDPOINT }}
         run: |
+          echo $API_ENDPOINT
           npx newman run ./postman_collection.json -r cli,html --reporter-html-export ./newman_report.html -e API_ENDPOINT
       - name: Tear Down Env
         run: aws cloudformation delete-stack --stack-name test-stack 
