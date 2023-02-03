@@ -31,18 +31,11 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: "16"
-      # - name: Env Prepare
-      #   # Configure env with aws credentials
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-
       - name: cdk deploy
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'deploy'
-          cdk_stack: 'test-stack'
+          cdk_stack: 'SampleStack'
           cdk_args: '--require-approval never'
           working_dir: 'sample'
           actions_comment: false
@@ -50,10 +43,9 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: 'us-west-2'
-
       - name: Get API Endpoint
         run: |
-          aws cloudformation wait stack-create-complete --stack-name test-stack
+          aws cloudformation wait stack-create-complete --stack-name SampleStack
           API_ENDPOINT=$(aws cloudformation describe-stacks --stack-name test-stack --query 'Stacks[0].Outputs[?OutputKey==`APIEndpoint`].OutputValue' --output text)
           echo "API_ENDPOINT=$API_ENDPOINT" >> $GITHUB_ENV
 
