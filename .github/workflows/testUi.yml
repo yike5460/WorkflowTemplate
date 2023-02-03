@@ -42,7 +42,7 @@ jobs:
         with:
           cdk_subcommand: 'deploy'
           cdk_stack: 'SampleStack'
-          cdk_args: '--require-approval never'
+          cdk_args: '--require-approval never --outputs-file cdk-output.json'
           working_dir: 'sample'
           actions_comment: false
         env:
@@ -51,7 +51,7 @@ jobs:
           AWS_DEFAULT_REGION: 'us-west-2'
       - name: Get API Endpoint
         run: |
-          API_ENDPOINT=$(aws cloudformation describe-stacks --stack-name test-stack --query 'Stacks[0].Outputs[?OutputKey==`APIEndpoint`].OutputValue' --output text)
+          API_ENDPOINT=$(cat cdk-output.json | jq -r '.SampleStack.APIEndpoint')
           echo "API_ENDPOINT=$API_ENDPOINT" >> $GITHUB_ENV
         # Launch CloudFormation stack and get the output for the API endpoint
         # run: |
