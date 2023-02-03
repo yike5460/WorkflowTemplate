@@ -49,7 +49,6 @@ jobs:
           echo "Starting content scanning `date` in `pwd`"
           ../viperlight/bin/viperlight scan -m files-contents -m files-aws -m files-binary -m files-entropy -m files-secrets
           echo "Completed content scanning `date`"
-
   git-secrets:
     name: git-secrets
     runs-on: ubuntu-18.04

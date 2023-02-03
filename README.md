@@ -13,5 +13,5 @@ The build stage is used to build the project. It is executed by the `build` scri
 The test stage is used to test the project by usage of UT/ST/Acceptance tests. It is executed by the `test*` script.
 
 ## Maintainance Stage
-The maintainance stage is used for maintainance tasks, including routine dependency update, PR lint. It is executed by the `depUpgrade`, `prLint` script.
+The maintainance stage is used for maintainance tasks, including routine dependency update, PR lint. It is executed by the `depUpgrade`, `prLint`, `issueExpiry` script.
 
