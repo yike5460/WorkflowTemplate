@@ -51,7 +51,7 @@ jobs:
           AWS_DEFAULT_REGION: 'us-west-2'
       - name: Get API Endpoint
         run: |
-          API_ENDPOINT=$(cat cdk-output.json | jq -r '.SampleStack.APIEndpoint')
+          API_ENDPOINT=$(cat ./sample/cdk-output.json | jq -r '.SampleStack.APIEndpoint')
           echo "API_ENDPOINT=$API_ENDPOINT" >> $GITHUB_ENV
         # Launch CloudFormation stack and get the output for the API endpoint
         # run: |
@@ -61,7 +61,7 @@ jobs:
         #   aws cloudformation wait stack-create-complete --stack-name test-stack
         #   API_ENDPOINT=$(aws cloudformation describe-stacks --stack-name test-stack --query 'Stacks[0].Outputs[?OutputKey==`APIEndpoint`].OutputValue' --output text)
         #   echo "API_ENDPOINT=$API_ENDPOINT" >> $GITHUB_ENV
-      - name: Install newman
+      - name: Install Newman
         run: npm install -g newman
       - name: Run UI test with Newman
         env:
