@@ -1,1 +1,25 @@
 // API test sample code with newman
+{
+    "info": {
+        "name": "Sample Postman Collection",
+        "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+        "description": "A sample collection to demonstrate collections as a set of related requests"
+    },
+    "item": [
+        {
+            "name": "A simple POST request with JSON body",
+            "request": {
+              "url": "{{APIEndpoint}}",
+              "method": "POST",
+              "header": [{
+                "key": "Content-Type",
+                "value": "application/json"
+              }],
+              "body": {
+                "mode": "raw",
+                "raw": "{\"text\":\"Message to fetch hellow world!\"}"
+              }
+            }
+        }
+    ]
+}
