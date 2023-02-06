@@ -66,6 +66,7 @@ jobs:
       - name: Run UI test with Newman
         env:
           API_ENDPOINT: ${{ env.API_ENDPOINT }}
+        working-directory: ./sample
         run: |
           echo $API_ENDPOINT
           # run the postman collection with the API endpoint from environment variable
