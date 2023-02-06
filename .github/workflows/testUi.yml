@@ -68,6 +68,7 @@ jobs:
           API_ENDPOINT: ${{ env.API_ENDPOINT }}
         run: |
           echo $API_ENDPOINT
-          npx newman run ./postman_collection.json -r cli,html --reporter-html-export ./newman_report.html -e API_ENDPOINT
+          # run the postman collection with the API endpoint from environment variable
+          npx newman run ./postman_collection.json -r cli,html --reporter-html-export ./newman_report.html --env-var "API_ENDPOINT=$API_ENDPOINT"
       - name: Tear Down Env
         run: aws cloudformation delete-stack --stack-name test-stack 
