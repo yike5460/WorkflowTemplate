@@ -11,6 +11,7 @@ jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
+    working-directory: ./sample
     steps:
       - name: Checkout
         uses: actions/checkout@v2
