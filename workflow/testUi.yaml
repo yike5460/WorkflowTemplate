@@ -61,13 +61,13 @@ jobs:
         #   aws cloudformation wait stack-create-complete --stack-name test-stack
         #   API_ENDPOINT=$(aws cloudformation describe-stacks --stack-name test-stack --query 'Stacks[0].Outputs[?OutputKey==`APIEndpoint`].OutputValue' --output text)
         #   echo "API_ENDPOINT=$API_ENDPOINT" >> $GITHUB_ENV
-      - name: Install Newman
-        run: npm install -g newman
       - name: Run UI test with Newman
         env:
           API_ENDPOINT: ${{ env.API_ENDPOINT }}
         working-directory: ./sample
         run: |
+          npm install -g newman
+          npm install newman-reporter-html
           echo $API_ENDPOINT
           # run the postman collection with the API endpoint from environment variable
           npx newman run ./postman_collection.json -r cli,html --reporter-html-export ./newman_report.html --env-var "API_ENDPOINT=$API_ENDPOINT"

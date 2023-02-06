@@ -8,7 +8,7 @@
         {
             "name": "A simple POST request with JSON body",
             "request": {
-              "url": "{{APIEndpoint}}",
+              "url": "{{API_ENDPOINT}}",
               "method": "POST",
               "header": [{
                 "key": "Content-Type",
