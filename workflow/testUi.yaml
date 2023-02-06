@@ -51,7 +51,7 @@ jobs:
           AWS_DEFAULT_REGION: 'us-west-2'
       - name: Get API Endpoint
         run: |
-          API_ENDPOINT=$(cat cdk-output.json | jq -r '.SampleStack.APIEndpoint')
+          API_ENDPOINT=$(cat ./sample/cdk-output.json | jq -r '.SampleStack.APIEndpoint')
           echo "API_ENDPOINT=$API_ENDPOINT" >> $GITHUB_ENV
         # Launch CloudFormation stack and get the output for the API endpoint
         # run: |
@@ -61,13 +61,15 @@ jobs:
         #   aws cloudformation wait stack-create-complete --stack-name test-stack
         #   API_ENDPOINT=$(aws cloudformation describe-stacks --stack-name test-stack --query 'Stacks[0].Outputs[?OutputKey==`APIEndpoint`].OutputValue' --output text)
         #   echo "API_ENDPOINT=$API_ENDPOINT" >> $GITHUB_ENV
-      - name: Install newman
+      - name: Install Newman
         run: npm install -g newman
       - name: Run UI test with Newman
         env:
           API_ENDPOINT: ${{ env.API_ENDPOINT }}
+        working-directory: ./sample
         run: |
           echo $API_ENDPOINT
-          npx newman run ./postman_collection.json -r cli,html --reporter-html-export ./newman_report.html -e API_ENDPOINT
+          # run the postman collection with the API endpoint from environment variable
+          npx newman run ./postman_collection.json -r cli,html --reporter-html-export ./newman_report.html --env-var "API_ENDPOINT=$API_ENDPOINT"
       - name: Tear Down Env
         run: aws cloudformation delete-stack --stack-name test-stack 

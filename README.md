@@ -15,3 +15,20 @@ The test stage is used to test the project by usage of UT/ST/Acceptance tests. I
 ## Maintainance Stage
 The maintainance stage is used for maintainance tasks, including routine dependency update, PR lint. It is executed by the `depUpgrade`, `prLint`, `issueExpiry` script.
 
+## Approval Stage
+The approval stage is used to approve the release. It is executed by the `approve` script.
+
+## Release Stage
+The release stage is used to release the project. It is executed by the `release` script.
+
+## Deploy Stage
+The deploy stage is used to deploy the project. It is executed by the `deploy` script.
+
+## Cleanup Stage
+The cleanup stage is used to clean up the project. It is executed by the `cleanup` script.
+
+## Other Reference
+- https://github.com/marketplace/actions/aws-cdk-github-actions
+- https://docs.github.com/en/actions/using-workflows/
+- https://github.com/aws-actions/configure-aws-credentials
+- https://github.com/postmanlabs/newman/blob/develop/examples/sample-collection.json
