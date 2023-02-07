@@ -2,6 +2,7 @@ name: Pull Request Check Workflow
 on: 
   pull_request:
     types: [opened, edited, reopened, synchronize]
+  workflow_dispatch:    
 jobs:
   git-secrets:
     name: git-secrets
