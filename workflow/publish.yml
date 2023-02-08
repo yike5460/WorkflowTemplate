@@ -1,0 +1,56 @@
+name: Publish Workflow
+
+on: 
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  # generate final CloudFormationn template, mostly we will use shell script instead of cdk synth in consideration of s3 bucket, container image, etc.
+  cdk:
+    name: Generate CloudFormation template
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install CDK
+        run: |
+          npm install -g aws-cdk
+      - name: Generate CloudFormation template
+        working-directory: ./sample
+        run: |
+          cdk synth
+  # publish generated templates to S3 bucket
+  publish:
+    name: Publish CloudFormation template to S3 bucket
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install awscli
+      - name: Publish CloudFormation template to S3 bucket
+        run: |
+          aws s3 cp ./sample/cdk.out/ s3://<your-s3-bucket-name>/ --recursive
+  # generate implementation guide with MKDocs
+  mkdocs:
+    name: Generate implementation guide
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install MKDocs
+        run: |
+          sudo apt-get update
+          sudo apt-get install python3-pip
+          pip3 install mkdocs
+      - name: Generate implementation guide
+        working-directory: ./sample
+        run: |
+          mkdocs build
+  # update GitHub Pages with generated implementation guide
+  

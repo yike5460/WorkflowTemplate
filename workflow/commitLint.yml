@@ -1,34 +1,14 @@
-name: Pull Request Check Workflow
+name: Commit Check Workflow
+
 on: 
+  push:
+    branches: [ master ]
   pull_request:
+    branches: [ master ]
     types: [opened, edited, reopened, synchronize]
+  workflow_dispatch:
 
 jobs:
-  content_validate:
-    name: Valiate if PR is a valid cdk project
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Validate
-        working-directory: ./sample
-        run: |
-          echo "Validating if PR is a valid cdk project"
-          if [ -f "package.json" ]; then
-            echo "package.json file found"
-            if [ -f "cdk.json" ]; then
-              echo "cdk.json file found"
-              echo "Valid cdk project"
-            else
-              echo "cdk.json file not found"
-              echo "Invalid cdk project"
-              exit 1
-            fi
-          else
-            echo "package.json file not found"
-            echo "Invalid cdk project"
-            exit 1
-          fi
   sematic_validate:
     name: Validate PR title
     runs-on: ubuntu-latest
@@ -87,11 +67,11 @@ jobs:
     name: git-secrets
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Checkout awslabs/git-secrets
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: awslabs/git-secrets
           ref: master
@@ -102,3 +82,49 @@ jobs:
         run: |
           git-secrets --register-aws
           git-secrets --scan
+  # dependencies vulnerabilities scan with trivy
+  trivy:
+    name: trivy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+  # scanning with aws codeguru
+  codeguru:
+    name: codeguru
+    runs-on: ubuntu-latest
+    steps:
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      - name: CodeGuru Reviewer
+        uses: aws-actions/codeguru-reviewer@v1.1
+        with:
+          build_path: target # build artifact(s) directory
+          s3_bucket: codeguru-reviewer-my-bucket # S3 bucket to store the build artifacts
+      - name: Upload review result
+        if: ${{ github.event_name != 'push' }}
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: codeguru-results.sarif.json
+  

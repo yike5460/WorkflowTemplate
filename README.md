@@ -13,16 +13,10 @@ The build stage is used to build the project. It is executed by the `build` scri
 The test stage is used to test the project by usage of UT/ST/Acceptance tests. It is executed by the `test*` script.
 
 ## Maintainance Stage
-The maintainance stage is used for maintainance tasks, including routine dependency update, PR lint. It is executed by the `depUpgrade`, `prLint`, `issueExpiry` script.
+The maintainance stage is used for maintainance tasks, including routine dependency update, PR lint, commit Lint. It is executed by the `depUpgrade`, `prLint`, `commitLint`, `issueExpiry` script.
 
-## Approval Stage
-The approval stage is used to approve the release. It is executed by the `approve` script.
-
-## Release Stage
-The release stage is used to release the project. It is executed by the `release` script.
-
-## Deploy Stage
-The deploy stage is used to deploy the project. It is executed by the `deploy` script.
+## Publish Stage
+The deploy stage is used to deploy the project. It is executed by the `publish` script.
 
 ## Cleanup Stage
 The cleanup stage is used to clean up the project. It is executed by the `cleanup` script.
