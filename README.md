@@ -11,20 +11,19 @@ The workflow is composed of 5 stages: build, test, maintainance, publish, cleanu
 2. Copy the files from the `workflow` directory to the root of your repository
 3. Execute the `workflow` script to start the workflow
 
-## Build Stage
-The build stage is used to build the project. It is executed by the `build` script.
+There are typical stage for a workflow. You can add or remove stages as you need. The scripts are executed in the order of PR/Commit Check, Test (UT/ST/IT), Maintainance, Publish or on demand.
 
-## Test Stage
-The test stage is used to test the project by usage of UT/ST/Acceptance tests. It is executed by the `test*` script.
+## PR/Commit Check
+The PR/Commit Check stage is executed when a PR is created or a commit is pushed to the repository, to gurarantee the code quality according to the rules defined in the scripts.
 
-## Maintain Stage
-The maintain stage is used for maintainance tasks, including routine dependency update, PR lint, commit Lint. It is executed by the `depUpgrade`, `prLint`, `commitLint`, `issueExpiry` script.
+## Test
+The Test stage can be execute manually or automatically. It is used to test the actual deployed Amplify/REST API by using Postman/Newman. The Unit Test scripts are defined in the `test` directory while the Integration Test scripts are defined in the postman collection.
 
-## Publish Stage
-The deploy stage is used to deploy the project. It is executed by the `publish` script.
+## Maintainance
+The Maintainance stage mainly used to update the dependencies of the project for security reasons, and operate the PR lifecycle.
 
-## Cleanup Stage
-The cleanup stage is used to clean up the project. It is executed by the `cleanup` script.
+## Publish
+The Publish stage is used to publish the CloudFormation template to S3 bucket and generate implementation guide for the solution with use of MKDocs.
 
 ## Other Reference
 - https://docs.github.com/en/actions/using-workflows/
