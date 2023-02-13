@@ -17,8 +17,8 @@ The build stage is used to build the project. It is executed by the `build` scri
 ## Test Stage
 The test stage is used to test the project by usage of UT/ST/Acceptance tests. It is executed by the `test*` script.
 
-## Maintainance Stage
-The maintainance stage is used for maintainance tasks, including routine dependency update, PR lint, commit Lint. It is executed by the `depUpgrade`, `prLint`, `commitLint`, `issueExpiry` script.
+## Maintain Stage
+The aintain stage is used for maintainance tasks, including routine dependency update, PR lint, commit Lint. It is executed by the `depUpgrade`, `prLint`, `commitLint`, `issueExpiry` script.
 
 ## Publish Stage
 The deploy stage is used to deploy the project. It is executed by the `publish` script.
@@ -27,9 +27,9 @@ The deploy stage is used to deploy the project. It is executed by the `publish` 
 The cleanup stage is used to clean up the project. It is executed by the `cleanup` script.
 
 ## Other Reference
-- https://github.com/marketplace/actions/aws-cdk-github-actions
 - https://docs.github.com/en/actions/using-workflows/
-- https://github.com/aws-actions/configure-aws-credentials
-- https://github.com/postmanlabs/newman/blob/develop/examples/sample-collection.json
 - https://github.com/actions/checkout
+- https://github.com/aws-actions/configure-aws-credentials
 - https://github.com/aws-actions/codeguru-reviewer
+- https://github.com/marketplace/actions/aws-cdk-github-actions
+- https://github.com/postmanlabs/newman/tree/develop/examples

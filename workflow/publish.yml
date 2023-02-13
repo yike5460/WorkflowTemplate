@@ -9,19 +9,21 @@ on:
 
 jobs:
   # generate final CloudFormationn template, mostly we will use shell script instead of cdk synth in consideration of s3 bucket, container image, etc.
-  cdk:
-    name: Generate CloudFormation template
+  aws_cdk:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Install CDK
-        run: |
-          npm install -g aws-cdk
-      - name: Generate CloudFormation template
-        working-directory: ./sample
-        run: |
-          cdk synth
+    - name: cdk synth
+        uses: youyo/aws-cdk-github-actions@v2
+        with:
+          cdk_subcommand: 'synth'
+          cdk_stack: 'SampleStack'
+          cdk_args: '>> template.yaml'
+          working_dir: 'sample'
+          actions_comment: false
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
   # publish generated templates to S3 bucket
   publish:
     name: Publish CloudFormation template to S3 bucket
@@ -31,26 +33,34 @@ jobs:
         uses: actions/checkout@v3
       - name: Install AWS CLI
         run: |
-          sudo apt-get update
-          sudo apt-get install awscli
+        # install aws cli v2 if not installed
+        if ! command -v aws &> /dev/null
+        then
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+        fi
+      - name: Configure AWS CLI
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region ${{ secrets.AWS_REGION }}
       - name: Publish CloudFormation template to S3 bucket
         run: |
-          aws s3 cp ./sample/cdk.out/ s3://<your-s3-bucket-name>/ --recursive
-  # generate implementation guide with MKDocs
+          aws s3 cp ./sample/template.yaml s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$BUILD_VERSION/ --acl public-read --region ${{ secrets.AWS_REGION }}
+  # generate implementation guide with MKDocs, should be deprecate with replacement of GitHub Pages
   mkdocs:
-    name: Generate implementation guide
+    name: Generate implementation guide in PDF format
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install MKDocs
         run: |
-          sudo apt-get update
-          sudo apt-get install python3-pip
-          pip3 install mkdocs
-      - name: Generate implementation guide
+          - pip3 install mkdocs==1.2.2 mkdocs-material==7.2.2 weasyprint==52.5
+          - pip3 install git+https://github.com/comwes/mkpdfs-mkdocs-plugin@c265a7dfba4e3930b56c5197880ae0707f68d41a
+          - git clone --depth=1 --branch=mainline ${{ secrets.GCR_SOLUTIONS_PDF_THEME }} gcr-solutions-pdf-theme
+      - name: Execute script to generate implementation guide
         working-directory: ./sample
         run: |
-          mkdocs build
-  # update GitHub Pages with generated implementation guide
-  
+          ./igGenerate.sh
