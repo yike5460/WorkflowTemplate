@@ -18,7 +18,7 @@ The build stage is used to build the project. It is executed by the `build` scri
 The test stage is used to test the project by usage of UT/ST/Acceptance tests. It is executed by the `test*` script.
 
 ## Maintain Stage
-The aintain stage is used for maintainance tasks, including routine dependency update, PR lint, commit Lint. It is executed by the `depUpgrade`, `prLint`, `commitLint`, `issueExpiry` script.
+The maintain stage is used for maintainance tasks, including routine dependency update, PR lint, commit Lint. It is executed by the `depUpgrade`, `prLint`, `commitLint`, `issueExpiry` script.
 
 ## Publish Stage
 The deploy stage is used to deploy the project. It is executed by the `publish` script.
