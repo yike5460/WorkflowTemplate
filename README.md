@@ -1,6 +1,11 @@
 # WorkflowTemplate
 This is a template for a workflow. It is meant to be used as a starting point for a new workflow.
 
+## Overall Workflow
+The workflow is composed of 5 stages: build, test, maintainance, publish, cleanup. Each stage is executed by serveral scripts. Those scripts are executed in the order of build, test, maintainance, publish, cleanup or on demand.
+![workflow](./img/workflow.png)
+
+
 ## Usage
 1. Create a new repository from this template
 2. Copy the files from the `workflow` directory to the root of your repository
@@ -26,3 +31,5 @@ The cleanup stage is used to clean up the project. It is executed by the `cleanu
 - https://docs.github.com/en/actions/using-workflows/
 - https://github.com/aws-actions/configure-aws-credentials
 - https://github.com/postmanlabs/newman/blob/develop/examples/sample-collection.json
+- https://github.com/actions/checkout
+- https://github.com/aws-actions/codeguru-reviewer
