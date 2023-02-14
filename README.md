@@ -2,9 +2,9 @@
 This is a template for a workflow. It is meant to be used as a starting point for a new workflow.
 
 ## Overall Workflow
-The workflow is composed of 5 stages: build, test, maintainance, publish, cleanup. Each stage is executed by serveral scripts. Those scripts are executed in the order of build, test, maintainance, publish, cleanup or on demand.
-![workflow](./img/workflow.png)
+The workflow is based on GitHub Actions that triggered by the actions including PR/Commit, Manual, Schedule, etc. it is composed of several stages, including PR/Commit Check, Test, Maintainance, Publish, etc. with template files defined in the `workflow` directory. The sample folder includes a simple CDK project including test cases that used for the demonstration of overall workflow functionality.
 
+![workflow](./img/workflow.png)
 
 ## Usage
 1. Create a new repository from this template
