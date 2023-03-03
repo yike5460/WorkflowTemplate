@@ -7,17 +7,6 @@ on:
     branches: [ master ]
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-  # workflow_dispatch:
-  #     inputs:
-  #       AWS_ACCESS_KEY_ID:
-  #         description: "Access Key ID with Permissions to deploy IAM, and OIDC"
-  #         required: true
-  #       AWS_SECRET_ACCESS_KEY:
-  #         description: "Secret Access Key with Permissions to deploy IAM, and OIDC"
-  #         required: true
-  #       AWS_REGION:
-  #         description: "Region to deploy to."
-  #         required: true
 
 jobs:
   build:
@@ -38,6 +27,7 @@ jobs:
           cdk_args: '--require-approval never --outputs-file cdk-output.json'
           working_dir: 'sample'
           actions_comment: false
+        # will obsolete, use aws aws-actions/configure-aws-credentials instead
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
